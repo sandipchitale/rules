@@ -98,7 +98,7 @@ export class Visualizer {
 
   onResize() {
     const aspect = window.innerWidth / window.innerHeight;
-    const gridAspect = this.width / this.height;
+
     
     // We want to fit the grid entirely in view.
     // The grid geometry size is (width, height).
