@@ -19,6 +19,15 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
         <input type="checkbox" id="autoModeCheck" /> Auto Mode
       </label>
+    </div>
+    
+    <div>
+      <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+        <input type="checkbox" id="colorModeCheck" /> Color Mode
+      </label>
+    </div>
+
+    <div>
       <label style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
         Delay: <span id="delayValue">5</span>s
         <input type="range" id="delayInput" min="1" max="5" step="1" value="5" />
@@ -60,6 +69,7 @@ const runBtn = document.getElementById('runBtn') as HTMLButtonElement;
 const resetBtn = document.getElementById('resetBtn') as HTMLButtonElement;
 const randomBtn = document.getElementById('randomBtn') as HTMLButtonElement;
 const autoModeCheck = document.getElementById('autoModeCheck') as HTMLInputElement;
+const colorModeCheck = document.getElementById('colorModeCheck') as HTMLInputElement;
 const delayInput = document.getElementById('delayInput') as HTMLInputElement;
 const delayValue = document.getElementById('delayValue') as HTMLSpanElement;
 
@@ -99,6 +109,12 @@ delayInput.addEventListener('input', () => {
   if (autoModeCheck.checked) {
     startAutoMode();
   }
+});
+
+colorModeCheck.addEventListener('change', () => {
+  visualizer.setColorMode(colorModeCheck.checked);
+  // Re-render current state
+  visualizer.updateData(automata.grid);
 });
 
 // Stop auto mode if user manually changes rule or clicks buttons?

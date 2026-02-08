@@ -85,15 +85,94 @@ export class Visualizer {
      // Let's expect `Automata` to do the filling or do it here. 
      // Doing it here keeps Automata just math.
      
+    const colorHelper = new THREE.Color();
     for (let i = 0; i < this.width * this.height; i++) {
         const cell = source[i];
-        const color = cell ? 255 : 0;
         const index = i * 4;
-        this.data[index] = color;     // R
-        this.data[index + 1] = color; // G
-        this.data[index + 2] = color; // B
-        this.data[index + 3] = 255;   // A
-    }    
+
+        if (cell) {
+            if (this.useColor) {
+               // Calculate row index
+               const row = Math.floor(i / this.width);
+               
+               // Hue cycles from 0 to 1 based on row position.
+               // To smooth the blue-pink transition (around hue 0.8-0.9), we can
+               // use the full spectrum but maybe adjust lightness or saturation slightly
+               // if it looks too dark.
+               // Re-mapping slightly to avoid the very end if that's where the "abruptness" is?
+               // Actually, blue is around 0.66, pink/magenta around 0.83, red at 0/1.
+               // A full 0->1 cycle is a standard rainbow.
+               // Let's try 0 to 0.85 to stop at magenta/pink and avoid wrapping back to red if that's the issue.
+               // User said "transition around blue to pink is abrupt".
+               // Blue is ~240deg (0.66), Pink ~300deg (0.83).
+               // If we map 0..height to 0..0.85, we get Red->Yellow->Green->Blue->Magenta/Pink.
+               
+               const hue = (row / this.height) * 0.85; 
+               
+               // Full saturation, 50% lightness for bright rainbow colors
+               // Use constant lightness to ensure smooth transitions without abrupt jumps.
+               // Or use a gentle smooth curve if needed, but the previous 'if' created hard edges.
+               // Let's use constant 0.5 for now, which is standard HSL rainbow.
+               // If blue is too dark, we can boost it smoothly:
+               // lightness = 0.5 + 0.1 * Math.exp(-20 * Math.pow(hue - 0.66, 2));
+               // But usually constant L is best for "rainbow" unless specific need.
+               // The user complained about "abrupt" which was likely the step function.
+               
+
+               // Hue from 0 (Red) to 0.85 (Magenta).
+               // Pure Blue (0.66) often creates a dark band in HSL.
+               // We boost lightness smoothly around hue 0.66 to prevent this "abrupt" dark transition.
+               
+               let lightness = 0.5;
+               
+               // Center of Blue is ~0.66.
+               // We apply a smooth boost curve (Gaussian-like or triangular)
+               // Range of boost: roughly 0.55 to 0.77
+               const blueCenter = 0.66;
+               const dist = Math.abs(hue - blueCenter);
+               const width = 0.15;
+               
+               if (dist < width) {
+                   // Boost up to +0.2 at the center
+                   const boost = 0.2 * (1 - dist / width);
+                   lightness += boost;
+               }
+
+
+               colorHelper.setHSL(hue, 1.0, lightness);
+               
+               this.data[index] = Math.floor(colorHelper.r * 255);     // R
+               this.data[index + 1] = Math.floor(colorHelper.g * 255); // G
+               this.data[index + 2] = Math.floor(colorHelper.b * 255); // B
+            } else {
+               this.data[index] = 255;
+               this.data[index + 1] = 255;
+               this.data[index + 2] = 255;
+            }
+            this.data[index + 3] = 255;   // A
+        } else {
+            this.data[index] = 0;
+            this.data[index + 1] = 0;
+            this.data[index + 2] = 0;
+            this.data[index + 3] = 255;
+        }
+    }
+  }
+
+  useColor = false;
+  setColorMode(enabled: boolean) {
+      this.useColor = enabled;
+      // We need to re-render with current data. 
+      // But updateTextureBuffer needs `source` which we don't store here permanently?
+      // Ah, data is in texture buffer? No, `source` is the automata grid (0/1).
+      // We don't have access to automata grid here unless we store it.
+      // But wait, `updateData` is called from main loop.
+      // If we just set the flag, the next `run()` or update will fix it.
+      // To apply immediately, we'd need the current grid state.
+      // Let's rely on the caller to call updateData or we just store the last valid grid?
+      // Actually `visualizer` doesn't persist the `grid` source, only pixel data.
+      // So checking "Color Mode" might not update instantly unless we re-send data.
+      // It's better if `main.ts` handles the update call.
   }
 
   onResize() {
