@@ -4022,21 +4022,20 @@ void main() {
     </div>
 
     <div>
-      <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-        <input type="checkbox" id="autoModeCheck" /> Auto Mode
-      </label>
+      <div style="display: flex; flex-direction: column; gap: 5px; border: 1px solid #444; padding: 5px; border-radius: 4px; margin-bottom: 5px;">
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="checkbox" id="autoModeCheck" /> Auto Mode
+        </label>
+        <label style="display: flex; align-items: center; gap: 5px;">
+          Delay: <span id="delayValue">5</span>s
+          <input type="range" id="delayInput" min="1" max="5" step="1" value="5" />
+        </label>
+      </div>
     </div>
     
     <div>
       <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
         <input type="checkbox" id="colorModeCheck" /> Color Mode
-      </label>
-    </div>
-
-    <div>
-      <label style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
-        Delay: <span id="delayValue">5</span>s
-        <input type="range" id="delayInput" min="1" max="5" step="1" value="5" />
       </label>
     </div>
     
