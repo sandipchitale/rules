@@ -36,8 +36,16 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div>
       <small id="statusText">Ready</small>
     </div>
+    
+    <div id="analysis" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; min-height: 120px; width: 350px;">
+        <div><strong>Wolfram Class:</strong> <span id="wolframClass">...</span></div>
+        <div style="font-size: 0.85em; color: #aaa; margin-bottom: 5px; min-height: 2.5em;" id="classDesc">...</div>
+        <div><strong>Symmeties:</strong> <span id="symmetries">...</span></div>
+    </div>
   </div>
 `;
+
+import { analyzeRule } from './analysis';
 
 const WIDTH = 256;
 const HEIGHT = 256;
@@ -58,8 +66,20 @@ function run() {
   automata.reset();
   automata.run();
   visualizer.updateData(automata.grid);
+  visualizer.updateData(automata.grid);
   const statusEl = document.getElementById('statusText');
   if (statusEl) statusEl.textContent = `Rule ${automata.rule} rendered.`;
+  
+  // Analyze
+  const result = analyzeRule(automata.rule, automata);
+  
+  const wolframEl = document.getElementById('wolframClass');
+  const classDescEl = document.getElementById('classDesc');
+  const symEl = document.getElementById('symmetries');
+  
+  if (wolframEl) wolframEl.textContent = result.wolframClass;
+  if (classDescEl) classDescEl.textContent = result.description;
+  if (symEl) symEl.textContent = result.symmetries.join(', ');
 }
 
 // Controls
