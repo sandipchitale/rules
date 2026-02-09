@@ -6,7 +6,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div id="controls">
     <div>
       <label for="ruleInput">Rule (0-255):</label>
-      <input type="number" id="ruleInput" min="0" max="255" value="30" />
+      <div style="display: flex; gap: 5px; align-items: center;">
+        <button id="prevRuleBtn" style="padding: 2px 8px;">&lt;</button>
+        <input type="number" id="ruleInput" min="0" max="255" value="30" style="width: 60px;" />
+        <button id="nextRuleBtn" style="padding: 2px 8px;">&gt;</button>
+      </div>
     </div>
     
     <div>
@@ -84,6 +88,8 @@ function run() {
 
 // Controls
 const ruleInput = document.getElementById('ruleInput') as HTMLInputElement;
+const prevRuleBtn = document.getElementById('prevRuleBtn') as HTMLButtonElement;
+const nextRuleBtn = document.getElementById('nextRuleBtn') as HTMLButtonElement;
 const runBtn = document.getElementById('runBtn') as HTMLButtonElement;
 const resetBtn = document.getElementById('resetBtn') as HTMLButtonElement;
 const randomBtn = document.getElementById('randomBtn') as HTMLButtonElement;
@@ -173,4 +179,20 @@ ruleInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     runBtn.click();
   }
+});
+
+prevRuleBtn.addEventListener('click', () => {
+    let r = parseInt(ruleInput.value) - 1;
+    if (r < 0) r = 255;
+    ruleInput.value = r.toString();
+    automata.setRule(r);
+    run();
+});
+
+nextRuleBtn.addEventListener('click', () => {
+    let r = parseInt(ruleInput.value) + 1;
+    if (r > 255) r = 0;
+    ruleInput.value = r.toString();
+    automata.setRule(r);
+    run();
 });
